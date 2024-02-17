@@ -1,0 +1,6 @@
+  .focus-indicator-ext {
+      outline: 2px solid var(--focus-indicator-color) !important;
+      outline-offset: 0 !important;
+      border: 1px solid var(--focus-indicator-color) !important;
+      box-shadow: 0 0 0 1px var(--focus-indicator-color) inset !important;
+  }
