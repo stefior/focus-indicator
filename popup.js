@@ -40,6 +40,11 @@ chrome.tabs.query({ active: true, currentWindow: true }, function() {
 
             chrome.storage.sync.set({ siteList });
             siteListTextArea.value = siteList.join('\n');
+
+            saveSiteListBtn.textContent = 'List saved';
+            setTimeout(() => {
+                saveSiteListBtn.textContent = 'Save list';
+            }, 1000);
         });
 
         saveSiteListBtn.addEventListener('click', function() {
@@ -49,6 +54,11 @@ chrome.tabs.query({ active: true, currentWindow: true }, function() {
 
             chrome.storage.sync.set({ siteList });
             siteListTextArea.value = siteList.join('\n');
+
+            saveSiteListBtn.textContent = 'List saved';
+            setTimeout(() => {
+                saveSiteListBtn.textContent = 'Save list';
+            }, 1000);
         });
 
         toggleListTypeBtn.addEventListener('click', function() {
