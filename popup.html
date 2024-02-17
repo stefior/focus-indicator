@@ -8,9 +8,13 @@
 </head>
 
 <body>
+    <p id="disabledMessage" style="display: none;">Due to browser security restrictions, extensions are not permitted to run on certain protected pages, including this one. This limitation applies universally to all extensions for your safety.</p>
     <h3>Focus Indicator Settings</h3>
 
-    <button id="toggleCurrentSiteBtn" autofocus></button>
+    <div class="top-buttons">
+        <button id="toggleCurrentSiteBtn" autofocus></button>
+        <button id="reloadBtn" class="hidden">Reload page</button>
+    </div>
 
     <div id="siteListWrapper">
         <label for="siteListTextArea" id="listLabel"></label>

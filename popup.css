@@ -1,7 +1,16 @@
 .dark {
     background-color: #272727;
     color: #fff;
-    border-color: #fff;
+}
+
+button.dark {
+    border: 1px solid #fff;
+}
+
+button.dark:focus {
+    background-color: #fff;
+    color: #272727;
+    outline: 1px solid white;
 }
 
 .hidden {
@@ -9,12 +18,17 @@
 }
 
 body {
-    width: 250px;
+    width: 280px;
     padding: 10px;
     font-family: sans-serif;
     background-color: #fff;
     color: #272727;
     transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+#disabledMessage {
+    padding: 5px;
+    margin-bottom: 10px;
 }
 
 h3 {
@@ -32,6 +46,13 @@ button {
     display: inline-block;
     font-size: 14px;
     cursor: pointer;
+    outline-offset: 2px;
+}
+
+button:focus {
+    background-color: #272727;
+    color: white;
+    outline: 1px solid #272727;
 }
 
 textarea {
@@ -42,6 +63,7 @@ textarea {
     margin-bottom: 10px;
 }
 
+.top-buttons,
 .bottom-buttons {
     display: flex;
     justify-content: space-between;

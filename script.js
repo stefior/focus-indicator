@@ -11,10 +11,6 @@ chrome.storage.sync.get('siteList', function(data) {
             return; // Don't apply focus indicators
         }
 
-        // Rest of code
-
-
-
         // Relative luminance formula:
         // https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef
         function calculateRelativeLuminance(color) {
