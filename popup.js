@@ -34,6 +34,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
 
         // Show message on browser-protected pages
         if (currentHost === "chromewebstore.google.com" ||
+            currentHost === "chrome.google.com" ||
             !currentHost.includes('.')) {
 
             console.log(currentHost)

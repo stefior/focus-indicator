@@ -1,13 +1,13 @@
 chrome.storage.sync.get('siteList', function(data) {
     const siteList = data.siteList || [];
-    const currentHost = new URL(location.href).hostname;
+    const currentHost = location.host;
 
     chrome.storage.sync.get('listType', function(data) {
-        const isBlacklist = data.listType === 'blacklist' || data.listType === undefined;
+        const listType = data.listType || 'blacklist';
 
-        if (isBlacklist && siteList.includes(currentHost)) {
+        if (listType === 'blacklist' && siteList.includes(currentHost)) {
             return; // Don't apply focus indicators
-        } else if (!isBlacklist && !siteList.includes(currentHost)) {
+        } else if (listType !== 'blacklist' && !siteList.includes(currentHost)) {
             return; // Don't apply focus indicators
         }
 
@@ -107,15 +107,3 @@ chrome.storage.sync.get('siteList', function(data) {
         });
     });
 });
-// TODO:
-// - allow disabling on certain sites -- LIKE HOW DARK READER DOES IT WITH A SEPARATE PAGE
-// - should be greyed out on pages where it can't be used, like chrome://settings or the chrome web store. basically, detect if it is running on a page and put a disclaimer if it can't
-// - does it work for buttons that are all black and already have a black border? maybe in those cases the internal box shadow should be made white to add more contrast, or the border becomes white and the outline becomes black
-//
-// - icons
-// - add note to description on the chrome page that if they tab into something and it doesn't show,
-//   it may be because the focused element is offscreen. there are layers of
-//   redundancy in place, but it can't account for every possible way all websites are set up. I
-//   think it's an improvement for my web use personally, though. AND sometimes because of the
-//   redundancies, it may look a bit weird, but it prioritizes visibility over aestheticism. if
-//   you'd like, you can disable it on certain sites
