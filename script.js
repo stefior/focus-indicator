@@ -1,5 +1,5 @@
 chrome.storage.sync.get('siteList', function(data) {
-    const siteList = data.siteList || [];
+const siteList = data.siteList || [];
     const currentHost = location.host;
 
     chrome.storage.sync.get('listType', function(data) {
@@ -88,22 +88,27 @@ chrome.storage.sync.get('siteList', function(data) {
 
         document.addEventListener('focusin', event => {
             const focused = event.target;
-
             // (Background element's color is used instead of the focused element's
             // background due to the outline being shown around the element rather
             // than on the element)
             const bgElement = getOpaqueBgElement(focused);
+            if (bgElement) {
+                let bgColor = window.getComputedStyle(bgElement).backgroundColor;
 
-            let bgColor = window.getComputedStyle(bgElement).backgroundColor;
+                const outlineColor = getOutlineColor(bgColor);
 
-            const outlineColor = getOutlineColor(bgColor);
-
-            document.documentElement.style.setProperty('--focus-indicator-color', outlineColor);
-            focused.classList.add('focus-indicator-ext');
+                document.documentElement.style.setProperty('--focus-indicator-color', outlineColor);
+                if (focused.tagName == 'TEXTAREA') {
+                    focused.classList.add('focus-indicator-ext-textarea');
+                } else {
+                    focused.classList.add('focus-indicator-ext');
+                }
+            }
         });
 
         document.addEventListener('focusout', event => {
             event.target.classList.remove('focus-indicator-ext');
+            event.target.classList.remove('focus-indicator-ext-textarea');
         });
     });
 });
