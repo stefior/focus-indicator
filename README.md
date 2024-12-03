@@ -7,3 +7,6 @@ Focus Indicator uses multiple strategies to aim for it to work effectively acros
 It prioritizes function over form. If you'd like, you can disable the extension on certain sites (blacklist them) or you can enable the extension only on certain sites (whitelist them) by clicking on the extension and changing the options there.
 
 At the time of initially uploading this, it works on the latest version of Chrome, Edge, Opera, and Firefox.
+
+
+For feature requests or bug reports, feel free to send me an email: contact@stefior.com
