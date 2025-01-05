@@ -2,21 +2,12 @@
     "name": "Focus Indicator",
     "version": "1.0.0",
     "description": "Adds a high-contrast outline around the element with keyboard focus.",
-    "permissions": [
-        "storage",
-        "tabs"
-    ],
+    "permissions": ["storage", "tabs"],
     "content_scripts": [
         {
-            "matches": [
-                "<all_urls>"
-            ],
-            "css": [
-                "styles.css"
-            ],
-            "js": [
-                "script.js"
-            ],
+            "matches": ["<all_urls>"],
+            "css": ["styles.css"],
+            "js": ["script.js"],
             "all_frames": true
         }
     ],
