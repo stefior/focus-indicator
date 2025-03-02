@@ -1,66 +1,94 @@
 <!doctype html>
-<html>
+<html lang="en" class="dark">
     <head>
+        <meta charset="utf-8" />
         <title>Focus Indicator Settings</title>
         <style>
-            .dark {
-                background-color: #272727;
-                color: #fff;
+            /* Reset */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
             }
 
-            button.dark {
-                border: 1px solid #fff;
+            :root {
+                --dark-bg: hsl(0 0% 15.3%);
+                --light-bg: hsl(0 0% 100%);
+                --dark-text: hsl(0 0% 15.3%);
+                --light-text: hsl(0 0% 100%);
+                --border-radius: 3px;
             }
 
-            button.dark:focus {
-                background-color: #fff;
-                color: #272727;
-                outline: 1px solid white;
+            html.dark body {
+                background-color: var(--dark-bg);
+                color: var(--light-text);
             }
 
-            .hidden {
-                visibility: hidden;
+            button {
+                background-color: transparent;
+                border: 1px solid var(--dark-text);
+                border-radius: var(--border-radius);
+                color: var(--dark-text);
+                padding: 8px 16px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 0.9rem;
+                cursor: pointer;
+                outline-offset: 2px;
+            }
+
+            html.dark button {
+                border-color: var(--light-text);
+                background-color: var(--dark-bg);
+                color: var(--light-text);
+            }
+
+            button:focus {
+                background-color: var(--dark-bg);
+                color: var(--light-text);
+                outline: 1px solid var(--dark-text);
+            }
+
+            html.dark button:focus {
+                background-color: var(--light-bg);
+                color: var(--dark-text);
+                outline: 1px solid var(--light-text);
             }
 
             body {
-                width: 280px;
-                padding: 10px;
+                width: 320px;
+                padding: 15px;
                 font-family: sans-serif;
-                background-color: #fff;
-                color: #272727;
-                transition:
-                    background-color 0.15s,
-                    color 0.15s,
-                    border-color 0.15s;
+                background-color: var(--light-bg);
+                color: var(--dark-text);
+                user-select: none;
             }
 
             #disabledMessage {
                 padding: 5px;
                 margin-bottom: 10px;
+                border-radius: var(--border-radius);
+                background-color: var(--dark-bg);
+                color: var(--light-text);
+                display: none;
             }
 
-            h3 {
-                margin-top: 0;
+            html.dark #disabledMessage {
+                background-color: var(--light-bg);
+                color: var(--dark-text);
             }
 
-            button {
-                background-color: white;
-                border: 1px solid #272727;
-                border-radius: 3px;
-                color: #272727;
-                padding: 8px 16px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 14px;
-                cursor: pointer;
-                outline-offset: 2px;
+            #disabledMessage.visible {
+                display: block;
             }
 
-            button:focus {
-                background-color: #272727;
-                color: white;
-                outline: 1px solid #272727;
+            h1 {
+                margin: 0 0 15px 0;
+                font-size: 1.15rem;
+                font-weight: bold;
             }
 
             textarea {
@@ -69,6 +97,30 @@
                 resize: none;
                 font-family: monospace;
                 margin-bottom: 10px;
+                padding: 5px;
+                border-radius: var(--border-radius);
+                background-color: transparent;
+                color: var(--dark-text);
+                border: 1px solid var(--dark-text);
+            }
+
+            html.dark textarea {
+                background-color: var(--dark-bg);
+                color: var(--light-text);
+                border-color: var(--light-text);
+            }
+
+            textarea:focus {
+                background-color: var(--dark-bg);
+                color: var(--light-text);
+                outline: 1px solid var(--dark-text);
+                outline-offset: 2px;
+            }
+
+            html.dark textarea:focus {
+                background-color: var(--light-bg);
+                color: var(--dark-text);
+                outline: 1px solid var(--light-text);
             }
 
             .top-buttons,
@@ -83,31 +135,309 @@
                 gap: 4px;
                 margin-top: 10px;
             }
+
+            .config-section {
+                margin-top: 20px;
+                padding: 10px;
+                border: 1px solid currentColor;
+                border-radius: var(--border-radius);
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .config-section h2 {
+                margin: 0;
+                font-size: 1rem;
+                font-weight: bold;
+            }
+
+            #overlayConfigs {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            /* Toggle switch styles */
+            .toggle-switch {
+                display: flex;
+                align-items: stretch;
+                position: relative;
+                padding: 3px;
+                border: 1px solid currentColor;
+                border-radius: var(--border-radius);
+                cursor: pointer;
+                overflow: hidden;
+            }
+
+            .toggle-switch:focus-within {
+                outline: 1px solid currentColor;
+                outline-offset: 2px;
+            }
+
+            .toggle-switch input {
+                position: absolute;
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .toggle-switch span {
+                padding: 5px;
+                margin: auto;
+                flex: 1;
+                text-align: center;
+                user-select: none;
+                z-index: 1;
+            }
+
+            .toggle-switch .slider {
+                position: absolute;
+                content: "";
+                height: 100%;
+                width: 50%;
+                left: 0;
+                top: 0;
+                background-color: currentColor;
+            }
+
+            .toggle-switch input:checked + .slider {
+                transform: translateX(100%);
+            }
+
+            .toggle-switch span.active {
+                color: var(--light-bg);
+            }
+
+            html.dark .toggle-switch span.active {
+                color: var(--dark-bg);
+            }
+
+            /* Custom checkbox styles */
+            .custom-checkbox {
+                display: inline-flex;
+                align-items: center;
+                position: relative;
+                padding-left: 25px;
+                cursor: pointer;
+                user-select: none;
+                min-height: 20px !important;
+            }
+
+            .custom-checkbox input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+                height: 0;
+                width: 0;
+            }
+
+            .custom-checkbox:focus-within .checkmark {
+                outline: 1px solid currentColor;
+                outline-offset: 2px;
+            }
+
+            .checkmark {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 18px;
+                width: 18px;
+                background-color: transparent;
+                border: 1px solid var(--dark-text);
+                border-radius: var(--border-radius);
+            }
+
+            html.dark .checkmark {
+                background-color: var(--dark-bg);
+                border-color: var(--light-text);
+            }
+
+            .custom-checkbox input:checked ~ .checkmark {
+                background-color: var(--light-bg);
+            }
+
+            html.dark .custom-checkbox input:checked ~ .checkmark {
+                background-color: var(--dark-bg);
+            }
+
+            .custom-checkbox input:focus ~ .checkmark {
+                background-color: var(--dark-bg);
+            }
+
+            html.dark .custom-checkbox input:focus ~ .checkmark {
+                background-color: var(--light-bg);
+            }
+
+            .checkmark:after {
+                content: "";
+                position: absolute;
+                display: none;
+            }
+
+            .custom-checkbox input:checked ~ .checkmark:after {
+                display: block;
+            }
+
+            .custom-checkbox .checkmark:after {
+                left: 5px;
+                top: 2px;
+                width: 5px;
+                height: 10px;
+                border: solid var(--dark-text);
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+
+            html.dark .custom-checkbox .checkmark:after {
+                border-color: var(--light-text);
+            }
+
+            .custom-checkbox input:focus ~ .checkmark:after {
+                border-color: var(--light-text);
+            }
+
+            html.dark .custom-checkbox input:focus ~ .checkmark:after {
+                border-color: var(--dark-text);
+            }
+
+            /* Number input styles */
+            input[type="number"] {
+                background-color: transparent;
+                border: 1px solid var(--dark-text);
+                border-radius: var(--border-radius);
+                color: var(--dark-text);
+                padding: 5px;
+                width: 60px;
+                font-size: 0.9rem;
+                outline-offset: 2px;
+            }
+
+            html.dark input[type="number"] {
+                border-color: var(--light-text);
+                background-color: var(--dark-bg);
+                color: var(--light-text);
+            }
+
+            input[type="number"]:focus {
+                background-color: var(--dark-bg);
+                color: var(--light-text);
+                outline: 1px solid var(--dark-text);
+            }
+
+            html.dark input[type="number"]:focus {
+                background-color: var(--light-bg);
+                color: var(--dark-text);
+                outline: 1px solid var(--light-text);
+            }
+
+            input[type="number"]::-webkit-inner-spin-button,
+            input[type="number"]::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            .config-item {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                height: 25px;
+            }
+
+            .config-item > input {
+                margin-right: 100px;
+                margin-left: auto;
+            }
+
+            /*#testPageLink {*/
+            /*    font-size: 0.75rem;*/
+            /*    border-radius: var(--border-radius);*/
+            /*    text-decoration: none;*/
+            /*    text-underline-offset: 2px;*/
+            /*    color: var(--dark-text);*/
+            /*    outline: none;*/
+            /*    display: inline;*/
+            /*    width: auto;*/
+            /*}*/
+            /**/
+            /*html.dark #testPageLink {*/
+            /*    color: var(--light-text);*/
+            /*}*/
+            /**/
+            /*#testPageLink:focus {*/
+            /*    color: var(--light-text);*/
+            /*    text-decoration: underline;*/
+            /*}*/
         </style>
         <script src="popup.js" defer></script>
     </head>
-
     <body>
-        <p id="disabledMessage" style="display: none">
-            Due to browser security restrictions, extensions are not permitted
-            to run on certain protected pages, including this one. This
-            limitation applies universally to all extensions for your safety.
+        <p id="disabledMessage">
+            Due to browser security restrictions, this extension cannot be shown on certain pages, like this one. However, you can still modify settings here.
         </p>
-        <h3>Focus Indicator Settings</h3>
-
+        <h1>Focus Indicator Settings</h1>
         <div class="top-buttons">
-            <button id="toggleCurrentSiteBtn" autofocus></button>
-            <button id="reloadBtn" class="hidden">Reload page</button>
+            <button id="toggleCurrentSiteBtn" autofocus>
+                Add current site
+            </button>
         </div>
-
         <div id="siteListWrapper">
-            <label for="siteListTextArea" id="listLabel"></label>
+            <label id="listLabel" for="siteListTextArea"
+                >Manage blacklist:</label
+            >
             <textarea id="siteListTextArea"></textarea>
         </div>
-
         <div class="bottom-buttons">
-            <button id="saveSiteListBtn"></button>
-            <button id="toggleListTypeBtn"></button>
+            <button id="saveSiteListBtn">Save list</button>
+            <button id="toggleListTypeBtn">Switch to whitelist</button>
+        </div>
+        <div class="config-section">
+            <h2>Configuration</h2>
+            <label for="indicatorPositionInput">Indicator position:</label>
+            <label class="toggle-switch">
+                <input type="checkbox" id="indicatorPositionInput" />
+                <div class="slider"></div>
+                <span>On Element</span>
+                <span>Overlay</span>
+            </label>
+            <div id="overlayConfigs">
+                <div class="config-item">
+                    <label for="outlineWidthInput">Outline width (px):</label>
+                    <input
+                        type="number"
+                        id="outlineWidthInput"
+                        min="1"
+                        max="10"
+                        value="2"
+                    />
+                </div>
+                <div class="config-item">
+                    <label for="outlineOffsetInput">Outline offset (px):</label>
+                    <input
+                        type="number"
+                        id="outlineOffsetInput"
+                        min="0"
+                        max="10"
+                        value="0"
+                    />
+                </div>
+                <label class="custom-checkbox">
+                    <input type="checkbox" id="useTransitionCheckbox" />
+                    <span class="checkmark"></span>
+                    Use transition between focused elements
+                </label>
+                <label class="custom-checkbox">
+                    <input type="checkbox" id="textInputOverrideCheckbox" />
+                    <span class="checkmark"></span>
+                    Use "On Element" mode for text inputs
+                </label>
+            </div>
+            <label class="custom-checkbox">
+                <input type="checkbox" id="forceOpacityCheckbox" />
+                <span class="checkmark"></span>
+                Force full opacity on focused elements
+            </label>
+            <!--<a href="./test-backgrounds.html" target="_blank" id="testPageLink">Test Page</a>-->
         </div>
     </body>
 </html>

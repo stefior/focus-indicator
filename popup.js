@@ -1,138 +1,248 @@
-const disabledMessage = document.getElementById("disabledMessage");
-const toggleCurrentSiteBtn = document.getElementById("toggleCurrentSiteBtn");
-const reloadBtn = document.getElementById("reloadBtn");
-const siteListTextArea = document.getElementById("siteListTextArea");
-const saveSiteListBtn = document.getElementById("saveSiteListBtn");
-const toggleListTypeBtn = document.getElementById("toggleListTypeBtn");
-const listLabel = document.getElementById("listLabel");
-const body = document.querySelector("body");
-
+let currentHost;
 let listType;
+const overlayConfigs = document.getElementById("overlayConfigs");
+let elements = {
+    disabledMessage: document.getElementById("disabledMessage"),
+    toggleCurrentSiteBtn: document.getElementById("toggleCurrentSiteBtn"),
+    listLabel: document.getElementById("listLabel"),
+    textarea: document.getElementById("siteListTextArea"),
+    saveSiteListBtn: document.getElementById("saveSiteListBtn"),
+    toggleListTypeBtn: document.getElementById("toggleListTypeBtn"),
+    outlineWidthInput: document.getElementById("outlineWidthInput"),
+    outlineOffsetInput: document.getElementById("outlineOffsetInput"),
+    indicatorPositionInput: document.getElementById("indicatorPositionInput"),
+    useTransitionCheckbox: document.getElementById("useTransitionCheckbox"),
+    textInputOverrideCheckbox: document.getElementById(
+        "textInputOverrideCheckbox",
+    ),
+    forceOpacityCheckbox: document.getElementById("forceOpacityCheckbox"),
+};
 
-chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    const currentTab = tabs[0];
-    const currentHost = new URL(currentTab.url).host;
+function updateSliderSwitch(input) {
+    const solidText = input.parentElement.querySelector("span:nth-of-type(1)");
+    const invertedText = input.parentElement.querySelector(
+        "span:nth-of-type(2)",
+    );
+    solidText.className = input.checked ? "" : "active";
+    invertedText.className = input.checked ? "active" : "";
+}
 
-    reloadBtn.onclick = () => {
-        chrome.tabs.reload(currentTab.id);
-        window.close();
+function initializeEventListeners() {
+    // Toggle current site
+    elements.toggleCurrentSiteBtn.addEventListener("click", () => {
+        const siteList = elements.textarea.value.split("\n").filter(Boolean);
+        const currentIndex = siteList.indexOf(currentHost);
+
+        if (currentIndex !== -1) {
+            siteList.splice(currentIndex, 1);
+            elements.toggleCurrentSiteBtn.textContent = "Add current site";
+        } else {
+            siteList.push(currentHost);
+            elements.toggleCurrentSiteBtn.textContent = "Remove current site";
+        }
+
+        chrome.storage.sync.set({ siteList: [...new Set(siteList)] });
+        elements.textarea.value = siteList.join("\n");
+
+        elements.saveSiteListBtn.textContent = "Saved";
+        setTimeout(() => {
+            elements.saveSiteListBtn.textContent = "Save list";
+        }, 1000);
+    });
+
+    // Save site list
+    elements.saveSiteListBtn.addEventListener("click", () => {
+        const siteList = [
+            ...new Set(elements.textarea.value.split("\n").filter(Boolean)),
+        ];
+        chrome.storage.sync.set({ siteList });
+        elements.textarea.value = siteList.join("\n");
+
+        elements.saveSiteListBtn.textContent = "List saved";
+        setTimeout(() => {
+            elements.saveSiteListBtn.textContent = "Save list";
+        }, 1000);
+    });
+
+    // Indicator position
+    elements.indicatorPositionInput.addEventListener("change", () => {
+        const newMode = elements.indicatorPositionInput.checked
+            ? "overlay"
+            : "element";
+        chrome.storage.sync.set({ indicatorPosition: newMode });
+        updateSliderSwitch(elements.indicatorPositionInput);
+        overlayConfigs.style.display = newMode === "overlay" ? "flex" : "none";
+    });
+
+    elements.indicatorPositionInput.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            elements.indicatorPositionInput.checked = false;
+            elements.indicatorPositionInput.dispatchEvent(new Event("change"));
+        } else if (e.key === "ArrowRight") {
+            e.preventDefault();
+            elements.indicatorPositionInput.checked = true;
+            elements.indicatorPositionInput.dispatchEvent(new Event("change"));
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+        }
+    });
+
+    elements.indicatorPositionInput.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+            elements.indicatorPositionInput.checked =
+                !elements.indicatorPositionInput.checked;
+            elements.indicatorPositionInput.dispatchEvent(new Event("change"));
+        }
+    });
+
+    // Toggle list type
+    const toggleListType = () => {
+        listType = listType === "blacklist" ? "whitelist" : "blacklist";
+
+        if (listType === "blacklist") {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+
+        elements.toggleListTypeBtn.textContent = `Switch to ${
+            listType === "blacklist" ? "whitelist" : "blacklist"
+        }`;
+        elements.listLabel.textContent = `Manage ${listType}:`;
+
+        chrome.storage.sync.set({ listType: listType });
     };
 
-    chrome.storage.sync.get(["siteList", "listType"], function (data) {
-        let siteList = data.siteList || [];
-        listType = data.listType || "blacklist";
-
-        toggleTheme();
-
-        if (siteList.includes(currentHost)) {
-            toggleCurrentSiteBtn.textContent = `Remove current site`;
-        } else {
-            toggleCurrentSiteBtn.textContent = `Add current site`;
+    elements.toggleListTypeBtn.addEventListener("mouseup", toggleListType);
+    elements.toggleListTypeBtn.addEventListener("keyup", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleListType();
         }
+    });
 
-        siteListTextArea.value = siteList.join("\n");
+    // Outline width
+    elements.outlineWidthInput.addEventListener("change", () => {
+        const width = Math.min(
+            Math.max(parseInt(elements.outlineWidthInput.value), 1),
+            10,
+        );
+        elements.outlineWidthInput.value = width;
+        chrome.storage.sync.set({ outlineWidth: width });
+    });
 
-        // Show message on browser-protected pages
-        if (
-            currentHost === "chromewebstore.google.com" ||
-            currentHost === "chrome.google.com" ||
-            !currentHost.includes(".")
-        ) {
-            console.log(currentHost);
-            disabledMessage.style.display = "block";
-            if (listType === "blacklist") {
-                disabledMessage.style.backgroundColor = "white";
-                disabledMessage.style.color = "black";
-            } else {
-                disabledMessage.style.backgroundColor = "black";
-                disabledMessage.style.color = "white";
-            }
+    // Outline offset
+    elements.outlineOffsetInput.addEventListener("change", () => {
+        const offset = Math.min(
+            Math.max(parseInt(elements.outlineOffsetInput.value), 0),
+            10,
+        );
+        elements.outlineOffsetInput.value = offset;
+        chrome.storage.sync.set({ outlineOffset: offset });
+    });
 
-            toggleCurrentSiteBtn.disabled = true;
-            reloadBtn.disabled = true;
-            siteListTextArea.disabled = true;
-            saveSiteListBtn.disabled = true;
-            toggleListTypeBtn.disabled = true;
-
-            body.style.color = "lightgray";
-            toggleCurrentSiteBtn.style.color = "lightgray";
-            reloadBtn.style.color = "lightgray";
-            siteListTextArea.style.color = "lightgray";
-            saveSiteListBtn.style.color = "lightgray";
-            toggleListTypeBtn.style.color = "lightgray";
-            return;
+    // Use transition
+    elements.useTransitionCheckbox.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            elements.useTransitionCheckbox.click();
         }
+    });
 
-        toggleCurrentSiteBtn.addEventListener("click", function () {
-            siteList = siteListTextArea.value.split("\n").filter(Boolean);
-
-            if (siteList.includes(currentHost)) {
-                siteList.splice(siteList.indexOf(currentHost), 1);
-                toggleCurrentSiteBtn.textContent = "Add current site";
-            } else {
-                siteList.push(currentHost);
-                toggleCurrentSiteBtn.textContent = "Remove current site";
-            }
-
-            siteList = [...new Set(siteList)];
-
-            chrome.storage.sync.set({ siteList });
-            siteListTextArea.value = siteList.join("\n");
-
-            saveSiteListBtn.textContent = "Saved";
-            setTimeout(() => {
-                saveSiteListBtn.textContent = "Save list";
-            }, 1000);
-
-            reloadBtn.classList.remove("hidden");
-        });
-
-        saveSiteListBtn.addEventListener("click", function () {
-            siteList = siteListTextArea.value.split("\n").filter(Boolean);
-
-            siteList = [...new Set(siteList)];
-
-            chrome.storage.sync.set({ siteList });
-            siteListTextArea.value = siteList.join("\n");
-
-            saveSiteListBtn.textContent = "List saved";
-            setTimeout(() => {
-                saveSiteListBtn.textContent = "Save list";
-            }, 1000);
-        });
-
-        toggleListTypeBtn.addEventListener("click", function () {
-            listType = getOppositeType();
-            toggleTheme();
-            chrome.storage.sync.set({ listType });
+    elements.useTransitionCheckbox.addEventListener("change", () => {
+        chrome.storage.sync.set({
+            useTransition: elements.useTransitionCheckbox.checked,
         });
     });
+
+    // Text input override
+    elements.textInputOverrideCheckbox.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            elements.textInputOverrideCheckbox.click();
+        }
+    });
+
+    elements.textInputOverrideCheckbox.addEventListener("change", () => {
+        chrome.storage.sync.set({
+            textInputOverride: elements.textInputOverrideCheckbox.checked,
+        });
+    });
+
+    // Force opacity
+    elements.forceOpacityCheckbox.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            elements.forceOpacityCheckbox.click();
+        }
+    });
+
+    elements.forceOpacityCheckbox.addEventListener("change", () => {
+        chrome.storage.sync.set({
+            forceOpacity: elements.forceOpacityCheckbox.checked,
+        });
+    });
+}
+
+function addSliderTransitions() {
+    const sliders = document.querySelectorAll(".toggle-switch .slider");
+    setTimeout(() => {
+        sliders.forEach((slider) => {
+            slider.style.transition = "transform 0.2s";
+        });
+    }, 100);
+}
+
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    currentHost = new URL(tabs[0].url).host;
+
+    chrome.storage.sync.get(
+        [
+            "listType",
+            "siteList",
+            "outlineWidth",
+            "outlineOffset",
+            "indicatorPosition",
+            "useTransition",
+            "textInputOverride",
+            "forceOpacity",
+        ],
+        (data) => {
+            listType = data.listType;
+
+            elements.textarea.value = data.siteList.join("\n");
+            elements.toggleCurrentSiteBtn.textContent = data.siteList.includes(
+                currentHost,
+            )
+                ? "Remove current site"
+                : "Add current site";
+            elements.toggleListTypeBtn.textContent = `Switch to ${
+                listType === "blacklist" ? "whitelist" : "blacklist"
+            }`;
+            elements.listLabel.textContent = `Manage ${listType}:`;
+            elements.outlineWidthInput.value = data.outlineWidth;
+            elements.outlineOffsetInput.value = data.outlineOffset;
+            elements.indicatorPositionInput.checked =
+                data.indicatorPosition === "overlay" ? true : false;
+            elements.useTransitionCheckbox.checked = data.useTransition;
+            elements.textInputOverrideCheckbox.checked = data.textInputOverride;
+            elements.forceOpacityCheckbox.checked = data.forceOpacity;
+
+            updateSliderSwitch(elements.indicatorPositionInput);
+
+            if (listType === "whitelist") {
+                document.documentElement.classList.remove("dark");
+            }
+
+            if (data.indicatorPosition === "overlay") {
+                overlayConfigs.style.display = "flex";
+            } else {
+                overlayConfigs.style.display = "none";
+            }
+
+            initializeEventListeners();
+            addSliderTransitions();
+        },
+    );
 });
-
-function getOppositeType() {
-    if (listType === "blacklist") {
-        return "whitelist";
-    } else {
-        return "blacklist";
-    }
-}
-
-function toggleTheme() {
-    if (listType === "blacklist") {
-        body.classList.add("dark");
-        toggleCurrentSiteBtn.classList.add("dark");
-        reloadBtn.classList.add("dark");
-        saveSiteListBtn.classList.add("dark");
-        toggleListTypeBtn.classList.add("dark");
-    } else {
-        body.classList.remove("dark");
-        reloadBtn.classList.remove("dark");
-        toggleCurrentSiteBtn.classList.remove("dark");
-        saveSiteListBtn.classList.remove("dark");
-        toggleListTypeBtn.classList.remove("dark");
-    }
-
-    saveSiteListBtn.textContent = `Save list`;
-    toggleListTypeBtn.textContent = `Switch to ${getOppositeType()}`;
-    listLabel.textContent = `Manage ${listType}:`;
-}

@@ -2,11 +2,26 @@ Adds a high-contrast outline around the element with keyboard focus.
 
 I predominantly use my keyboard to navigate websites, but many sites don't always make it clear where the keyboard is focused. This extension aims to help solve that issue by putting a white or black border around the focused element, depending on whichever results in a higher contrast.
 
-Focus Indicator uses multiple strategies to aim for it to work effectively across all websites, but it can't account for every improper accessibility setup. For example, if a site has a focusable element out of the screen's bounds, it won't show any difference.
+Focus Indicator uses multiple strategies to aim for it to work effectively across all websites, but it can't account for every improper accessibility setup. For example, if a site has a focusable element out of the screen's bounds, it won't show any difference. It also doesn't affect which elements are able to be focused with the keyboard.
 
-It prioritizes function over form. If you'd like, you can disable the extension on certain sites (blacklist them) or you can enable the extension only on certain sites (whitelist them) by clicking on the extension and changing the options there.
+It prioritizes function over form. If you'd like, you can disable the extension on certain sites (blacklist them) or you can enable the extension only on certain sites (whitelist them). All settings can be configured by clicking on the extension's icon.
 
-At the time of initially uploading this, it works on the latest version of Chrome, Edge, Opera, and Firefox.
+There are two focus indication methods, depending on your preference:
 
+1. Overlay (default, new with version 2)
+- Works by having a floating outline above the current focused element's position
+- Almost guaranteed to show the outline if it is possible to, EVEN IF the focused element is behind another element
 
-For feature requests or bug reports, feel free to send me an email: contact@stefior.com
+2. On Element
+- Works by modifying the current element's focused styles
+- The indicator will sometimes end up partly or fully covered up by other elements, but it can be less intrusive
+
+Settings for either mode:
+- Force opacity (default: off) - Makes the focused element fully visible if it was hidden using opacity
+    - Note: This won't affect elements hidden by other means
+
+Overlay Mode settings:
+- Outline width (default: 4px) - Adjust the thickness of the outline
+- Outline offset (default: 1px) - Set how much space there is between the element and the outline
+- Use transition between focused elements (default: off) - Animates focus shifts for better visual tracking
+- Use "On Element" mode for text input elements (default: on) - The overlay may cover text while typing in certain text input elements, mainly in online code editors, so "On Element" mode can be used for just those elements instead

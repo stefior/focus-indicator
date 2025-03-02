@@ -1,29 +1,28 @@
 {
+    "manifest_version": 3,
     "name": "Focus Indicator",
-    "version": "1.0.0",
-    "description": "Adds a high-contrast outline around the element with keyboard focus.",
-    "permissions": ["storage", "tabs"],
-    "content_scripts": [
-        {
-            "matches": ["<all_urls>"],
-            "css": ["styles.css"],
-            "js": ["script.js"],
-            "all_frames": true
-        }
-    ],
+    "version": "2.0.0",
+    "description": "Adds a high-contrast outline around the element with keyboard focus",
+    "permissions": ["storage", "scripting", "tabs"],
+    "host_permissions": ["<all_urls>"],
+    "background": {
+        "service_worker": "background.js"
+    },
     "action": {
         "default_popup": "popup.html"
     },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js", "chooseOutlineColor.js"],
+            "all_frames": true,
+            "match_about_blank": true
+        }
+    ],
     "icons": {
         "16": "icons/icon16.png",
         "32": "icons/icon32.png",
         "48": "icons/icon48.png",
         "128": "icons/icon128.png"
-    },
-    "manifest_version": 3,
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "focusindicator@stefior.com"
-        }
     }
 }
