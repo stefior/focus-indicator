@@ -11,6 +11,7 @@ let elements = {
     outlineWidthInput: document.getElementById("outlineWidthInput"),
     outlineOffsetInput: document.getElementById("outlineOffsetInput"),
     indicatorPositionInput: document.getElementById("indicatorPositionInput"),
+    indicatorColorInput: document.getElementById("indicatorColorInput"),
     useTransitionCheckbox: document.getElementById("useTransitionCheckbox"),
     textInputOverrideCheckbox: document.getElementById(
         "textInputOverrideCheckbox",
@@ -93,6 +94,37 @@ function initializeEventListeners() {
             elements.indicatorPositionInput.checked =
                 !elements.indicatorPositionInput.checked;
             elements.indicatorPositionInput.dispatchEvent(new Event("change"));
+        }
+    });
+
+    // Indicator color
+    elements.indicatorColorInput.addEventListener("change", () => {
+        const newMode = elements.indicatorColorInput.checked
+            ? "hybrid"
+            : "solid";
+        chrome.storage.sync.set({ indicatorColor: newMode });
+        updateSliderSwitch(elements.indicatorColorInput);
+    });
+
+    elements.indicatorColorInput.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            elements.indicatorColorInput.checked = false;
+            elements.indicatorColorInput.dispatchEvent(new Event("change"));
+        } else if (e.key === "ArrowRight") {
+            e.preventDefault();
+            elements.indicatorColorInput.checked = true;
+            elements.indicatorColorInput.dispatchEvent(new Event("change"));
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+        }
+    });
+
+    elements.indicatorColorInput.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+            elements.indicatorColorInput.checked =
+                !elements.indicatorColorInput.checked;
+            elements.indicatorColorInput.dispatchEvent(new Event("change"));
         }
     });
 
@@ -204,6 +236,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             "outlineWidth",
             "outlineOffset",
             "indicatorPosition",
+            "indicatorColor",
             "useTransition",
             "textInputOverride",
             "forceOpacity",
@@ -225,11 +258,14 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             elements.outlineOffsetInput.value = data.outlineOffset;
             elements.indicatorPositionInput.checked =
                 data.indicatorPosition === "overlay" ? true : false;
+            elements.indicatorColorInput.checked =
+                data.indicatorColor === "hybrid" ? true : false;
             elements.useTransitionCheckbox.checked = data.useTransition;
             elements.textInputOverrideCheckbox.checked = data.textInputOverride;
             elements.forceOpacityCheckbox.checked = data.forceOpacity;
 
             updateSliderSwitch(elements.indicatorPositionInput);
+            updateSliderSwitch(elements.indicatorColorInput);
 
             if (listType === "whitelist") {
                 document.documentElement.classList.remove("dark");
@@ -245,4 +281,16 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             addSliderTransitions();
         },
     );
+});
+
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    chrome.scripting
+        .executeScript({
+            target: { tabId: tabs[0].id },
+            func: () => {},
+        })
+        .catch(() => {
+            // If we can't inject a script, consider it a protected page
+            elements.disabledMessage.classList.add("visible");
+        });
 });

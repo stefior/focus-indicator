@@ -2,7 +2,7 @@
 
 (function () {
     const inIframe = window.self !== window.top;
-    let currentHost = location.host;
+    let currentHost = window.location.host;
     let outerHostInterval = null;
     if (inIframe) {
         // If users choose to blacklist a site, it would be unexpected to see
@@ -35,6 +35,7 @@
             "outlineWidth",
             "outlineOffset",
             "indicatorPosition",
+            "indicatorColor",
             "forceOpacity",
             "useTransition",
             "textInputOverride",
@@ -46,6 +47,7 @@
                 return;
             }
 
+            handleFocusIn({ target: document.activeElement });
             applyFocusIndicators();
         },
     );
@@ -60,45 +62,102 @@
         const newOverlay = document.createElement("div");
         newOverlay.id = id;
         saveInlineStyles(newOverlay, {
+            margin: "0",
+            padding: "0",
             position: "fixed",
             visibility: "hidden",
-            "pointer-events": "none",
             "z-index": "2147483647",
+            "pointer-events": "none",
+            background: "none",
+            transition: "none",
+            filter: "none",
+            transform: "none",
+            outline: "none",
+            border: "none",
+            opacity: "1",
+            "clip-path": "none",
+            "user-select": "none",
+            "mix-blend-mode": "none",
+            "touch-action": "none",
         });
 
         return newOverlay;
     }
 
-    function updateOverlay(focused) {
+    function updateOverlay(focused, outlineColor = null) {
+        const isTextInput = isTextInputElement(focused);
         if (!focused || focused.tabIndex < 0 || focused.tagName === "IFRAME") {
-            return;
+            if (!isTextInput) {
+                return;
+            }
         }
 
         if (!document.getElementById(overlay.id)) {
+            // We could do this every time the overlay is updated to account for
+            // the possibility of something having max z-index and coming after
+            // it in the document, but I don't want to cover up hint-based extensions
             document.documentElement.appendChild(overlay);
         }
 
         const rect = focused.getBoundingClientRect();
-        lastKnownPosition = {
-            top: Math.round(rect.top) - settings.outlineOffset,
-            left: Math.round(rect.left) - settings.outlineOffset,
-            width: Math.round(rect.width) + settings.outlineOffset * 2,
-            height: Math.round(rect.height) + settings.outlineOffset * 2,
-        };
-
-        const outlineColor = chooseOutlineColor(focused);
         lastBorderRadius = window.getComputedStyle(focused).borderRadius;
-        saveInlineStyles(overlay, {
-            top: `${lastKnownPosition.top}px`,
-            left: `${lastKnownPosition.left}px`,
-            width: `${lastKnownPosition.width}px`,
-            height: `${lastKnownPosition.height}px`,
-            "box-shadow": `0 0 0 1px ${outlineColor === "black" ? "white" : "black"},
-                           0 0 0 ${1 + settings.outlineWidth}px ${outlineColor}`,
-            "border-radius": lastBorderRadius,
-        });
 
-        if (!settings.textInputOverride || !isTextInputElement(focused)) {
+        saveInlineStyles(focused, { outline: "none" }); // So no duplicate outline from the website's styles
+        if (settings.indicatorColor === "hybrid") {
+            const combinedOffset =
+                settings.outlineOffset + settings.outlineWidth;
+            lastKnownPosition = {
+                top: Math.round(rect.top) - combinedOffset,
+                left: Math.round(rect.left) - combinedOffset,
+                width: Math.round(rect.width) + combinedOffset * 2,
+                height: Math.round(rect.height) + combinedOffset * 2,
+            };
+
+            const w = settings.outlineWidth;
+            saveInlineStyles(overlay, {
+                top: `${lastKnownPosition.top}px`,
+                left: `${lastKnownPosition.left}px`,
+                width: `${lastKnownPosition.width}px`,
+                height: `${lastKnownPosition.height}px`,
+                "backdrop-filter": "grayscale(1) contrast(999) invert(1)",
+                "clip-path": `polygon(
+              /* Top left corner */  0 0,
+             /* Top right corner */  100% 0,
+          /* Bottom right corner */  100% 100%,
+           /* Bottom left corner */  0 100%,
+              /* Top left corner */  0 0,
+        /* Top left INNER corner */  ${w}px ${w}px,
+     /* Bottom left INNER corner */  ${w}px calc(100% - ${w}px),
+    /* Bottom right INNER corner */  calc(100% - ${w}px) calc(100% - ${w}px),
+       /* Top right INNER corner */  calc(100% - ${w}px) ${w}px,
+        /* Top left INNER corner */  ${w}px ${w}px
+                )`,
+            });
+            saveInlineStyles(focused, { border: "none" });
+        } else {
+            if (outlineColor === null) {
+                outlineColor = chooseOutlineColor(focused);
+            }
+            lastKnownPosition = {
+                top: Math.round(rect.top) - settings.outlineOffset,
+                left: Math.round(rect.left) - settings.outlineOffset,
+                width: Math.round(rect.width) + settings.outlineOffset * 2,
+                height: Math.round(rect.height) + settings.outlineOffset * 2,
+            };
+            saveInlineStyles(overlay, {
+                top: `${lastKnownPosition.top}px`,
+                left: `${lastKnownPosition.left}px`,
+                width: `${lastKnownPosition.width}px`,
+                height: `${lastKnownPosition.height}px`,
+                "border-radius": lastBorderRadius,
+                "box-shadow": `0 0 0 1px ${outlineColor === "black" ? "white" : "black"},
+                           0 0 0 ${1 + settings.outlineWidth}px ${outlineColor}`,
+                "backdrop-filter": "none",
+                "clip-path": "none",
+            });
+        }
+
+        if (!settings.textInputOverride || !isTextInput) {
             saveInlineStyles(overlay, { visibility: "visible" });
         }
     }
@@ -181,13 +240,11 @@
     }
 
     function isTextInputElement(element) {
-        const tagName = element.tagName.toLowerCase();
-
-        if (tagName === "textarea" || element.isContentEditable) {
+        if (element.tagName === "TEXTAREA" || element.isContentEditable) {
             return true;
         }
 
-        if (tagName === "input") {
+        if (element.tagName === "INPUT") {
             const type = element.type.toLowerCase();
             const textInputTypes = [
                 "text",
@@ -222,7 +279,11 @@
 
     function handleFocusIn(event) {
         lastBorderRadius = null;
-        let focused = event.target;
+        let focused = event?.target;
+        const isTextInput = isTextInputElement(focused);
+        if (!focused || (focused.tabIndex < 0 && !isTextInput)) {
+            return;
+        }
 
         try {
             const possibleShadow = chrome.dom.openOrClosedShadowRoot(focused);
@@ -237,20 +298,19 @@
 
         focused = getDeepestFocus(event.target);
         const previouslyFocused = event.relatedTarget;
-
         const outlineColor = chooseOutlineColor(focused);
 
+        // Either mode
         if (settings.forceOpacity) {
             saveInlineStyles(focused, { opacity: "1" });
         }
-
         if (
             (settings.indicatorPosition === "element" ||
                 settings.textInputOverride) &&
-            isTextInputElement(focused)
+            isTextInput
         ) {
-            // Seeing the white cursor can be difficult if there is a white
-            // right up against it, so we will avoid doing that for text inputs
+            // Seeing the cursor can be difficult if there is a border right up
+            // against it, so we will avoid doing that for text inputs
             // by only having an outline with an offset.
             //
             // The outline is 4px instead of 2px so it is the same width as it
@@ -260,14 +320,15 @@
                 "outline-offset": "2px",
             });
             if (settings.useTransition) {
-                updateOverlay(focused);
+                updateOverlay(focused, outlineColor);
             }
             return;
         }
 
+        // Element mode
         if (settings.indicatorPosition === "element") {
             saveInlineStyles(focused, {
-                border: `1px solid ${outlineColor}`,
+                border: `1px solid ${outlineColor}`, // Can make some stuff move slightly, but it is needed for cases when the element's outline is covered
                 outline: `2px solid ${outlineColor}`,
                 "outline-offset": "0",
                 "box-shadow": `0 0 0 1px ${outlineColor === "black" ? "white" : "black"} inset`,
@@ -275,7 +336,7 @@
             return;
         }
 
-        saveInlineStyles(focused, { outline: "none" }); // So no duplicate outline from the website's styles
+        // Overlay mode
         if (
             settings.useTransition &&
             previouslyFocused &&
@@ -285,7 +346,7 @@
         } else {
             saveInlineStyles(overlay, { transition: "none" });
         }
-        updateOverlay(focused);
+        updateOverlay(focused, outlineColor);
     }
 
     function saveInlineStyles(element, styles) {
@@ -340,8 +401,9 @@
             const originalValue = element.getAttribute(tempAttribute);
 
             if (originalValue === null) {
-                element.style.removeProperty(property);
                 continue;
+            } else if (!originalValue) {
+                element.style.removeProperty(property);
             }
 
             element.style[property] = originalValue;
@@ -351,7 +413,7 @@
 
     function isEnabledOnHost(host) {
         if (!host) {
-            return false;
+            return true; // It's probably a file
         }
 
         const listHasHost = settings.siteList?.includes(host);
@@ -376,9 +438,6 @@
         if (settings.indicatorPosition !== "element") {
             document.documentElement.appendChild(overlay);
             window.focusIndicatorRAF = requestAnimationFrame(updateOverlayRAF);
-        }
-        if (document.activeElement.tabIndex >= 0) {
-            handleFocusIn({ target: document.activeElement });
         }
     }
 
@@ -458,10 +517,14 @@
                             cancelAnimationFrame(window.focusIndicatorRAF);
                         } else {
                             document.documentElement.appendChild(overlay);
-                            updateOverlay();
+                            updateOverlay(document.documentElement);
                             window.focusIndicatorRAF =
                                 requestAnimationFrame(updateOverlayRAF);
                         }
+                        break;
+
+                    case "indicatorColor":
+                        updateOverlay(document.documentElement);
                         break;
 
                     case "textInputOverride":

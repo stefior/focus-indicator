@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Focus Indicator - Update</title>
+        <style>
+            body {
+                background: black;
+                font-family: Arial, sans-serif;
+                padding: 10px;
+                font-size: 1rem;
+            }
+
+            #updateContainer {
+                background: black;
+                color: white;
+                max-width: 610px;
+                margin: auto;
+                padding: 20px 40px;
+                border: white 4px solid;
+                border-radius: 5px;
+            }
+
+            #header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding-right: 20px;
+                padding-top: 10px;
+            }
+
+            h1 {
+                text-align: center;
+                margin: 0;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+            }
+
+            li {
+                margin-bottom: 8px;
+            }
+
+            a {
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="updateContainer">
+            <div id="header">
+                <h1>Focus Indicator Updated</h1>
+                <img
+                    src="./icons/icon48.png"
+                    alt="Extension icon"
+                    width="48"
+                    height="48"
+                />
+            </div>
+            <p>
+                Along with bug fixes, there are now two focus indication methods
+                available by clicking on the extension's icon, depending on your
+                preference:
+            </p>
+
+            <h2>Overlay (new)</h2>
+            <ul>
+                <li>
+                    Works by having a floating outline above the current focused
+                    element's position
+                </li>
+                <li>
+                    Almost guaranteed to show the outline if it is possible to,
+                    even if the focused element is behind another element
+                </li>
+            </ul>
+
+            <h2>On Element (previous method)</h2>
+            <ul>
+                <li>Works by modifying the current element's focused styles</li>
+                <li>
+                    The indicator will sometimes end up partly or fully covered
+                    up by other elements, but it can be less intrusive
+                </li>
+                <li>
+                    <u
+                        >If you dislike the overlay method, you can switch back
+                        to this</u
+                    >
+                </li>
+            </ul>
+
+            <h2>Overlay Mode settings:</h2>
+            <ul>
+                <li>Indicator color</li>
+                <li style="margin-left: 40px">
+                    Solid (default) - The entire outline will be either solid
+                    black or solid white
+                </li>
+                <li style="margin-left: 40px">
+                    Hybrid - Each individual pixel in the outline will be either
+                    black or white, whichever is closest to the inverse of
+                    whatever is behind it
+                </li>
+                <li>
+                    Outline width (default: 4px) - Adjust the thickness of the
+                    outline
+                </li>
+                <li>
+                    Outline offset (default: 1px) - Set how much space there is
+                    between the element and the outline
+                </li>
+                <li>
+                    Use transition between focused elements (default: off) -
+                    Animates focus shifts for better visual tracking
+                </li>
+                <li>
+                    Use "On Element" mode for text input elements (default: on)
+                    - The overlay may cover text while typing in certain text
+                    input elements, mainly in online code editors, so "On
+                    Element" mode can be used for just those elements instead
+                </li>
+            </ul>
+
+            <h2>Settings for either mode:</h2>
+            <ul>
+                <li>
+                    Force opacity (default: on) - Makes the focused element
+                    fully visible if it was hidden using opacity
+                </li>
+                <li style="margin-left: 40px">
+                    <i
+                        >(Note: This won't affect elements hidden by other
+                        means)</i
+                    >
+                </li>
+            </ul>
+
+            <hr />
+
+            <p>
+                If you have any issues with this update, feel free to send me an
+                email at contact@stefior.com
+            </p>
+        </div>
+    </body>
+</html>

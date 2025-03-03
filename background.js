@@ -1,8 +1,8 @@
-//chrome.runtime.onInstalled.addListener((details) => {
-//    if (details.reason === "update") {
-//        chrome.tabs.create({ url: "update.html" });
-//    }
-//});
+chrome.runtime.onInstalled.addListener((details) => {
+    if (details.reason === "update") {
+        chrome.tabs.create({ url: "update.html" });
+    }
+});
 
 const DEFAULT_SETTINGS = {
     siteList: [],
@@ -10,9 +10,10 @@ const DEFAULT_SETTINGS = {
     outlineWidth: 4,
     outlineOffset: 1,
     indicatorPosition: "overlay",
+    indicatorColor: "solid",
     useTransition: false,
     textInputOverride: true,
-    forceOpacity: false,
+    forceOpacity: true,
 };
 
 async function initializeSettings() {
