@@ -290,7 +290,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             func: () => {},
         })
         .catch(() => {
-            // If we can't inject a script, consider it a protected page
-            elements.disabledMessage.classList.add("visible");
+            if (!tabs[0].url.includes(chrome.runtime.id)) {
+                // If we can't inject a script, consider it a protected page
+                elements.disabledMessage.style.opacity = "1";
+            }
         });
 });

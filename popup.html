@@ -21,8 +21,8 @@
             }
 
             body {
-                width: 580px;
-                height: 370px;
+                width: 600px;
+                height: 405px;
                 padding: 25px;
                 margin: 0;
                 font-family: sans-serif;
@@ -60,16 +60,12 @@
                 border-radius: var(--border-radius);
                 background-color: var(--dark-bg);
                 color: var(--light-text);
-                display: none;
+                opacity: 0;
             }
 
             html.dark #disabledMessage {
                 background-color: var(--light-bg);
                 color: var(--dark-text);
-            }
-
-            #disabledMessage.visible {
-                display: block;
             }
 
             #settingsWrapper {
@@ -412,9 +408,8 @@
         <div id="headerWrapper">
             <h1>Focus Indicator Settings</h1>
             <p id="disabledMessage">
-                Due to browser security restrictions, this extension cannot be
-                shown on the current page. However, you can still modify
-                settings here.
+                Due to browser security restrictions, this extension cannot work
+                on the current page, but you can still modify settings here.
             </p>
         </div>
         <div id="settingsWrapper">

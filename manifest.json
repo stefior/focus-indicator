@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Focus Indicator",
-    "version": "2.1.1",
+    "version": "2.1.2",
     "description": "Adds a high-contrast outline around the element with keyboard focus",
     "permissions": ["storage", "scripting", "tabs"],
     "host_permissions": ["<all_urls>"],
