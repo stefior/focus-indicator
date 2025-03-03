@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS = {
     indicatorColor: "solid",
     useTransition: false,
     textInputOverride: true,
-    forceOpacity: true,
+    forceOpacity: false,
 };
 
 async function initializeSettings() {

@@ -22,7 +22,3 @@ Overlay Mode settings:
 - Outline offset (default: 1px) - Set how much space there is between the element and the outline
 - Use transition between focused elements (default: off) - Animates focus shifts for better visual tracking
 - Use "On Element" mode for text input elements (default: on) - The overlay may cover text while typing in certain text input elements, mainly in online code editors, so "On Element" mode can be used for just those elements instead
-
-Settings for either mode:
-- Force opacity (default: on) - Makes the focused element fully visible if it was hidden using opacity
-    - Note: This won't affect elements hidden by other means

@@ -16,7 +16,7 @@ let elements = {
     textInputOverrideCheckbox: document.getElementById(
         "textInputOverrideCheckbox",
     ),
-    forceOpacityCheckbox: document.getElementById("forceOpacityCheckbox"),
+    //forceOpacityCheckbox: document.getElementById("forceOpacityCheckbox"),
 };
 
 function updateSliderSwitch(input) {
@@ -202,19 +202,19 @@ function initializeEventListeners() {
         });
     });
 
-    // Force opacity
-    elements.forceOpacityCheckbox.addEventListener("keyup", (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            elements.forceOpacityCheckbox.click();
-        }
-    });
-
-    elements.forceOpacityCheckbox.addEventListener("change", () => {
-        chrome.storage.sync.set({
-            forceOpacity: elements.forceOpacityCheckbox.checked,
-        });
-    });
+    //// Force opacity
+    //elements.forceOpacityCheckbox.addEventListener("keyup", (e) => {
+    //    if (e.key === "Enter") {
+    //        e.preventDefault();
+    //        elements.forceOpacityCheckbox.click();
+    //    }
+    //});
+    //
+    //elements.forceOpacityCheckbox.addEventListener("change", () => {
+    //    chrome.storage.sync.set({
+    //        forceOpacity: elements.forceOpacityCheckbox.checked,
+    //    });
+    //});
 }
 
 function addSliderTransitions() {
@@ -239,7 +239,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             "indicatorColor",
             "useTransition",
             "textInputOverride",
-            "forceOpacity",
+            //"forceOpacity",
         ],
         (data) => {
             listType = data.listType;
@@ -262,7 +262,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                 data.indicatorColor === "hybrid" ? true : false;
             elements.useTransitionCheckbox.checked = data.useTransition;
             elements.textInputOverrideCheckbox.checked = data.textInputOverride;
-            elements.forceOpacityCheckbox.checked = data.forceOpacity;
+            //elements.forceOpacityCheckbox.checked = data.forceOpacity;
 
             updateSliderSwitch(elements.indicatorPositionInput);
             updateSliderSwitch(elements.indicatorColorInput);
