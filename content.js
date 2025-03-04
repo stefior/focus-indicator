@@ -132,6 +132,8 @@
        /* Top right INNER corner */  calc(100% - ${w}px) ${w}px,
         /* Top left INNER corner */  ${w}px ${w}px
                 )`,
+                "border-radius": "0",
+                "box-shadow": "none",
             });
         } else {
             if (outlineColor === null) {
@@ -561,18 +563,31 @@
             return false;
         }
 
+        let currentPosition;
         const rect = element.getBoundingClientRect();
-        const currentBorderRadius =
-            window.getComputedStyle(element).borderRadius;
-        if (lastBorderRadius && currentBorderRadius !== lastBorderRadius) {
-            return true;
+        if (settings.indicatorColor === "hybrid") {
+            const combinedOffset =
+                settings.outlineOffset + settings.outlineWidth;
+            currentPosition = {
+                top: Math.round(rect.top) - combinedOffset,
+                left: Math.round(rect.left) - combinedOffset,
+                width: Math.round(rect.width) + combinedOffset * 2,
+                height: Math.round(rect.height) + combinedOffset * 2,
+            };
+        } else {
+            const currentBorderRadius =
+                window.getComputedStyle(element).borderRadius;
+            if (lastBorderRadius && currentBorderRadius !== lastBorderRadius) {
+                return true;
+            }
+            currentPosition = {
+                top: Math.round(rect.top) - settings.outlineOffset,
+                left: Math.round(rect.left) - settings.outlineOffset,
+                width: Math.round(rect.width) + settings.outlineOffset * 2,
+                height: Math.round(rect.height) + settings.outlineOffset * 2,
+            };
         }
-        const currentPosition = {
-            top: Math.round(rect.top) - settings.outlineOffset,
-            left: Math.round(rect.left) - settings.outlineOffset,
-            width: Math.round(rect.width) + settings.outlineOffset * 2,
-            height: Math.round(rect.height) + settings.outlineOffset * 2,
-        };
+
         const changed = Object.entries(currentPosition).some(
             ([key, value]) => lastKnownPosition[key] !== value,
         );
