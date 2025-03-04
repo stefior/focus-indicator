@@ -1,5 +1,5 @@
 chrome.runtime.onInstalled.addListener((details) => {
-    if (details.reason === "update") {
+    if (details.reason === "update" && details.previousVersion === "1.0.0") {
         chrome.tabs.create({ url: "update.html" });
     }
 });
