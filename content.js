@@ -133,7 +133,6 @@
         /* Top left INNER corner */  ${w}px ${w}px
                 )`,
             });
-            saveInlineStyles(focused, { border: "none" });
         } else {
             if (outlineColor === null) {
                 outlineColor = chooseOutlineColor(focused);
