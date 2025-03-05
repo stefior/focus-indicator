@@ -102,7 +102,6 @@
         const rect = focused.getBoundingClientRect();
         lastBorderRadius = window.getComputedStyle(focused).borderRadius;
 
-        saveInlineStyles(focused, { outline: "none" }); // So no duplicate outline from the website's styles
         if (settings.indicatorColor === "hybrid") {
             const combinedOffset =
                 settings.outlineOffset + settings.outlineWidth;
@@ -338,6 +337,7 @@
         }
 
         // Overlay mode
+        saveInlineStyles(focused, { outline: "none" }); // So no duplicate outline from the website's styles
         if (
             settings.useTransition &&
             previouslyFocused &&
@@ -355,7 +355,7 @@
         for (const [property, value] of Object.entries(styles)) {
             if (element.id !== "focusIndicatorOverlay") {
                 const tempAttribute = `data-original-${property}`;
-                if (!element.getAttribute(tempAttribute)) {
+                if (element.getAttribute(tempAttribute) === null) {
                     element.setAttribute(
                         tempAttribute,
                         element.style[property],
