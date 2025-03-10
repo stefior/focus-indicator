@@ -11,6 +11,13 @@
         window.top.postMessage({ type: "GET_CURRENT_HOST" }, "*");
     }
 
+    let overlayShadowHost = document.getElementById("focusIndicatorShadowHost");
+    if (!overlayShadowHost) {
+        overlayShadowHost = document.createElement("div");
+        overlayShadowHost.id = "focusIndicatorShadowHost";
+        document.documentElement.appendChild(overlayShadowHost);
+    }
+
     let indicatorsAreEnabled = false;
     const settings = {};
     const overlay = createOverlay();
@@ -55,7 +62,12 @@
 
     function createOverlay() {
         const id = "focusIndicatorOverlay";
-        const existingOverlay = document.getElementById(id);
+
+        const shadowRoot =
+            overlayShadowHost.shadowRoot ||
+            overlayShadowHost.attachShadow({ mode: "closed" });
+
+        const existingOverlay = shadowRoot.getElementById(id);
         if (existingOverlay) {
             return existingOverlay;
         }
@@ -78,9 +90,11 @@
             opacity: "1",
             "clip-path": "none",
             "user-select": "none",
-            "mix-blend-mode": "none",
+            "mix-blend-mode": "normal",
             "touch-action": "none",
         });
+
+        shadowRoot.appendChild(newOverlay);
 
         return newOverlay;
     }
@@ -93,11 +107,11 @@
             }
         }
 
-        if (!document.getElementById(overlay.id)) {
+        if (!document.getElementById(overlayShadowHost.id)) {
             // We could do this every time the overlay is updated to account for
             // the possibility of something having max z-index and coming after
             // it in the document, but I don't want to cover up hint-based extensions
-            document.documentElement.appendChild(overlay);
+            document.documentElement.appendChild(overlayShadowHost);
         }
 
         const rect = focused.getBoundingClientRect();
@@ -441,7 +455,7 @@
         window.addEventListener("blur", handleWindowBlur);
 
         if (settings.indicatorPosition !== "element") {
-            document.documentElement.appendChild(overlay);
+            document.documentElement.appendChild(overlayShadowHost);
             window.focusIndicatorRAF = requestAnimationFrame(updateOverlayRAF);
         }
     }
@@ -476,6 +490,7 @@
 
         cancelAnimationFrame(window.focusIndicatorRAF);
         overlay.remove();
+        overlayShadowHost.remove();
     }
 
     function handleWindowFocus() {
@@ -548,7 +563,9 @@
                             overlay.remove();
                             cancelAnimationFrame(window.focusIndicatorRAF);
                         } else {
-                            document.documentElement.appendChild(overlay);
+                            document.documentElement.appendChild(
+                                overlayShadowHost,
+                            );
                             window.focusIndicatorRAF =
                                 requestAnimationFrame(updateOverlayRAF);
                         }
