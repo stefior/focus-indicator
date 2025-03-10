@@ -484,6 +484,17 @@
                 if (!isEnabledOnHost(currentHost)) {
                     removeFocusIndicators();
                 }
+
+                // Pass message on to nested iframes
+                for (const iframe of liveCollectionIframes) {
+                    iframe.contentWindow.postMessage(
+                        {
+                            type: "UPDATE_CURRENT_HOST",
+                            host: location.host,
+                        },
+                        "*",
+                    );
+                }
                 break;
             }
             case "GET_CURRENT_HOST": {
