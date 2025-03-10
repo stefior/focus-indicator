@@ -27,6 +27,7 @@
         height: 0,
     };
     let lastMovementTime = 0;
+    let windowIsFocused = true;
 
     chrome.storage.sync.get(
         [
@@ -436,6 +437,9 @@
         document.addEventListener("shadow-focusin", handleFocusInFromShadow);
         document.addEventListener("shadow-focusout", handleFocusOutFromShadow);
 
+        window.addEventListener("focus", handleWindowFocus);
+        window.addEventListener("blur", handleWindowBlur);
+
         if (settings.indicatorPosition !== "element") {
             document.documentElement.appendChild(overlay);
             window.focusIndicatorRAF = requestAnimationFrame(updateOverlayRAF);
@@ -453,6 +457,9 @@
             handleFocusOutFromShadow,
         );
 
+        window.removeEventListener("focus", handleWindowFocus);
+        window.removeEventListener("blur", handleWindowBlur);
+
         for (const shadowRoot of shadowFocusListeners.keys()) {
             const { focusInHandlerInsideShadow, focusOutHandlerInsideShadow } =
                 shadowFocusListeners.get(shadowRoot);
@@ -469,6 +476,19 @@
 
         cancelAnimationFrame(window.focusIndicatorRAF);
         overlay.remove();
+    }
+
+    function handleWindowFocus() {
+        windowIsFocused = true;
+        if (settings.indicatorPosition !== "element") {
+            cancelAnimationFrame(window.focusIndicatorRAF);
+            window.focusIndicatorRAF = requestAnimationFrame(updateOverlayRAF);
+        }
+    }
+
+    function handleWindowBlur() {
+        windowIsFocused = false;
+        cancelAnimationFrame(window.focusIndicatorRAF);
     }
 
     function handleWindowMessages(message) {
@@ -529,14 +549,9 @@
                             cancelAnimationFrame(window.focusIndicatorRAF);
                         } else {
                             document.documentElement.appendChild(overlay);
-                            updateOverlay(document.documentElement);
                             window.focusIndicatorRAF =
                                 requestAnimationFrame(updateOverlayRAF);
                         }
-                        break;
-
-                    case "indicatorColor":
-                        updateOverlay(document.documentElement);
                         break;
 
                     case "textInputOverride":
@@ -606,6 +621,10 @@
     }
 
     function updateOverlayRAF() {
+        if (!windowIsFocused) {
+            return;
+        }
+
         try {
             const now = Date.now();
             if (now - lastMovementTime > 500 && now - then < 100) {
