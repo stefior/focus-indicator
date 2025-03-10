@@ -17,7 +17,7 @@ There are two focus indication methods, depending on your preference:
 Overlay Mode settings:
 - Indicator color mode
     - Solid (default) - The outline will be either solid black or solid white
-    - Hybrid - The outline will be a black and white inversion of whatever is directly behind each individual portion of it
+    - Hybrid - Each individual pixel in the outline will be either black or white, whichever is closest to the inverse of whatever is directly behind it
 - Outline width (default: 4px) - Adjust the thickness of the outline
 - Outline offset (default: 1px) - Set how much space there is between the element and the outline
 - Use transition between focused elements (default: off) - Animates focus shifts for better visual tracking
