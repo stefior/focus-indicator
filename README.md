@@ -18,12 +18,12 @@ It prioritizes function over form. If you'd like, you can disable the extension 
 There are two focus indication methods, depending on your preference:
 
 1. Overlay (default, new with version 2)
-- Works by having a floating outline above the current focused element's position
-- Almost guaranteed to show the outline if it is possible to, EVEN IF the focused element is behind another element
+    - Works by having a floating outline above the current focused element's position
+    - Almost guaranteed to show the outline if it is possible to, EVEN IF the focused element is behind another element
 
 2. On Element
-- Works by modifying the current element's focused styles
-- The indicator will sometimes end up partly or fully covered up by other elements, but it can be less intrusive
+    - Works by modifying the current element's focused styles
+    - The indicator will sometimes end up partly or fully covered up by other elements, but it can be less intrusive
 
 Overlay Mode settings:
 - Indicator color mode
