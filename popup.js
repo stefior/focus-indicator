@@ -60,6 +60,13 @@ function initializeEventListeners() {
         elements.textarea.value = siteList.join("\n");
 
         elements.saveSiteListBtn.textContent = "List saved";
+
+        elements.toggleCurrentSiteBtn.textContent = siteList.includes(
+            currentHost,
+        )
+            ? "Remove current site"
+            : "Add current site";
+
         setTimeout(() => {
             elements.saveSiteListBtn.textContent = "Save list";
         }, 1000);
