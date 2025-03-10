@@ -255,6 +255,7 @@
                 width: 0;
             }
 
+            .custom-checkbox:active .checkmark,
             .custom-checkbox:focus-within .checkmark {
                 outline: 1px solid currentColor;
                 outline-offset: 2px;
@@ -284,10 +285,12 @@
                 background-color: var(--dark-bg);
             }
 
+            .custom-checkbox input:active ~ .checkmark,
             .custom-checkbox input:focus ~ .checkmark {
                 background-color: var(--dark-bg);
             }
 
+            html.dark .custom-checkbox input:active ~ .checkmark,
             html.dark .custom-checkbox input:focus ~ .checkmark {
                 background-color: var(--light-bg);
             }
