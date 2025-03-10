@@ -297,9 +297,34 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             func: () => {},
         })
         .catch(() => {
-            if (!tabs[0].url.includes(chrome.runtime.id)) {
-                // If we can't inject a script, consider it a protected page
-                elements.disabledMessage.style.opacity = "1";
+            const url = tabs[0].url;
+            const extensionId = chrome.runtime.id;
+            if (url.includes(extensionId)) {
+                return;
+            }
+
+            // If we can't inject a script, consider it a protected page
+            elements.disabledMessage.style.opacity = "1";
+
+            if (url.startsWith("file://")) {
+                elements.disabledMessage.textContent =
+                    "File URL access for Focus Indicator is currently disabled. It can be enabled on ";
+
+                const link = document.createElement("a");
+                link.textContent = "this page";
+                link.style.color = "blue";
+                link.style.textDecoration = "underline";
+                link.style.cursor = "pointer";
+
+                // Using this because opening "chrome://" urls with href is blocked
+                link.onclick = (event) => {
+                    event.preventDefault();
+                    chrome.tabs.create({
+                        url: `chrome://extensions/?id=${extensionId}`,
+                    });
+                };
+
+                elements.disabledMessage.appendChild(link);
             }
         });
 });
