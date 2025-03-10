@@ -1,3 +1,14 @@
+<div align="center">
+    
+# Focus Indicator
+
+**A chrome extension for adding a high-contrast outline around the element with keyboard focus**
+    
+<img alt="Focus Indicator Icon" height="150" src="/icons/icon512.png" />
+</div>
+
+---
+
 I predominantly use my keyboard to navigate websites, but many sites don't always make it clear where the keyboard is focused. This extension aims to help solve that issue by putting a white or black border around the focused element, depending on whichever results in a higher contrast.
 
 Focus Indicator uses multiple strategies to aim for it to work effectively across all websites, but it can't account for every improper accessibility setup. For example, if a site has a focusable element out of the screen's bounds, it won't show any difference. It also doesn't affect which elements are able to be focused with the keyboard.
