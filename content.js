@@ -100,7 +100,22 @@
         return newOverlay;
     }
 
-    function updateOverlay(focused, outlineColor = null) {
+    function updateOverlay(
+        focused,
+        previouslyFocused = null,
+        outlineColor = null,
+    ) {
+        if (
+            settings.useTransition &&
+            previouslyFocused &&
+            previouslyFocused !== document.body &&
+            previouslyFocused !== focused
+        ) {
+            saveInlineStyles(overlay, { transition: "all 0.05s linear" });
+        } else {
+            saveInlineStyles(overlay, { transition: "none" });
+        }
+
         const isTextInput = isTextInputElement(focused);
         if (!focused || focused.tabIndex < 0 || focused.tagName === "IFRAME") {
             if (!isTextInput) {
@@ -336,7 +351,7 @@
                 "outline-offset": "2px",
             });
             if (settings.useTransition) {
-                updateOverlay(focused, outlineColor);
+                updateOverlay(focused, previouslyFocused, outlineColor);
             }
             return;
         }
@@ -354,16 +369,7 @@
 
         // Overlay mode
         saveInlineStyles(focused, { outline: "none" }); // So no duplicate outline from the website's styles
-        if (
-            settings.useTransition &&
-            previouslyFocused &&
-            previouslyFocused !== document.body
-        ) {
-            saveInlineStyles(overlay, { transition: "all 0.05s linear" });
-        } else {
-            saveInlineStyles(overlay, { transition: "none" });
-        }
-        updateOverlay(focused, outlineColor);
+        updateOverlay(focused, previouslyFocused, outlineColor);
     }
 
     function saveInlineStyles(element, styles) {
@@ -670,4 +676,3 @@
         }
     }
 })();
-
