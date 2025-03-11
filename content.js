@@ -12,11 +12,12 @@
     }
 
     let overlayShadowHost = document.getElementById("focusIndicatorShadowHost");
-    if (!overlayShadowHost) {
-        overlayShadowHost = document.createElement("div");
-        overlayShadowHost.id = "focusIndicatorShadowHost";
-        document.documentElement.appendChild(overlayShadowHost);
+    if (overlayShadowHost) {
+        overlayShadowHost.remove();
     }
+    overlayShadowHost = document.createElement("div");
+    overlayShadowHost.id = "focusIndicatorShadowHost";
+    document.documentElement.appendChild(overlayShadowHost);
 
     let indicatorsAreEnabled = false;
     const settings = {};
